@@ -229,8 +229,8 @@ def histogram(stream, options):
                 break
 
     # auto-pick the hash scale
-    if max(bucket_counts) > 75:
-        bucket_scale = int(max(bucket_counts) / 75)
+    if max(bucket_counts) > options.width:
+        bucket_scale = int(max(bucket_counts) / options.width)
 
     print("# NumSamples = %d; Min = %0.2f; Max = %0.2f" %
           (samples, min_v, max_v))
@@ -289,6 +289,8 @@ if __name__ == "__main__":
     parser.add_option("-p", "--percentage", dest="percentage", default=False,
                       action="store_true", help="List percentage for each bar")
     parser.add_option("--dot", dest="dot", default='∎', help="Dot representation")
+    parser.add_option("-w", "--width", dest="width", type="int", default=75,
+                      action="store", help="output width of chart [75]")
 
     (options, args) = parser.parse_args()
     if sys.stdin.isatty():
@@ -296,5 +298,8 @@ if __name__ == "__main__":
         parser.print_usage()
         print "for more help use --help"
         sys.exit(1)
+    if options.width == 0:
+        # if width is 0, force to -1, to avoid division by zero exception
+        options.width = -1
     histogram(load_stream(sys.stdin, options.agg_value_key,
                           options.agg_key_value), options)
